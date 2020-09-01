@@ -25,6 +25,7 @@ import (
 	"path"
 	"strings"
 	"time"
+	"crypto/tls"
 )
 
 // DefaultRoundTripper is used if no RoundTripper is set in Config.
@@ -69,10 +70,13 @@ func NewClient(cfg Config) (Client, error) {
 		return nil, err
 	}
 	u.Path = strings.TrimRight(u.Path, "/")
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
 
 	return &httpClient{
 		endpoint: u,
-		client:   http.Client{Transport: cfg.roundTripper()},
+		client:   http.Client{Transport: tr},
 	}, nil
 }
 
